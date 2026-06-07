@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ひとことボード | 匿名ひとこと掲示板</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <h1 class="site-title">ひとこと<span class="title-accent">ボード</span></h1>
+    <p class="site-tagline">いま思っていることを、ひとことだけ。</p>
+  </header>
+
+  <main class="board">
+    <section class="post-form-card" aria-labelledby="form-heading">
+      <h2 id="form-heading" class="visually-hidden">投稿フォーム</h2>
+      <% if (error) { %>
+        <p class="error-message" role="alert"><%= error %></p>
+      <% } %>
+      <form action="/posts" method="post" class="post-form">
+        <div class="form-row">
+          <label for="name">名前 <span class="optional">（省略すると匿名）</span></label>
+          <input type="text" id="name" name="name" maxlength="<%= MAX_NAME %>" placeholder="匿名">
+        </div>
+        <div class="form-row">
+          <label for="message">ひとこと <span class="required">必須・<%= MAX_MESSAGE %>文字まで</span></label>
+          <textarea id="message" name="message" maxlength="<%= MAX_MESSAGE %>" rows="3"
+            placeholder="今日もおつかれさま！" required></textarea>
+        </div>
+        <button type="submit" class="submit-button">投稿する</button>
+      </form>
+    </section>
+
+    <section class="posts" aria-labelledby="posts-heading">
+      <h2 id="posts-heading" class="posts-heading">
+        みんなのひとこと <span class="post-count"><%= posts.length %>件</span>
+      </h2>
+
+      <% if (posts.length === 0) { %>
+        <p class="empty-message">まだ投稿がありません。最初のひとことをどうぞ！</p>
+      <% } %>
+
+      <ul class="post-list">
+        <% posts.forEach((post) => { %>
+          <li class="post-card<%= post.isOwner ? ' is-own' : '' %>">
+            <p class="post-message"><%= post.message %></p>
+            <div class="post-meta">
+              <span class="post-author">
+                <%= post.name %><% if (post.isOwner) { %><span class="own-badge">自分</span><% } %>
+              </span>
+              <time class="post-date"><%= post.createdAt %></time>
+              <div class="post-actions">
+                <form action="/posts/<%= post.id %>/like" method="post">
+                  <button type="submit" class="like-button" aria-label="いいね">
+                    ♥ <%= post.likes %>
+                  </button>
+                </form>
+                <% if (post.isOwner) { %>
+                  <form action="/posts/<%= post.id %>/delete" method="post">
+                    <button type="submit" class="delete-button">削除</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          </li>
+        <% }) %>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>ひとことボード — Node.js + Express + SQLite で動いています</p>
+  </footer>
+</body>
+</html>

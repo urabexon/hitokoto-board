@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: hitokoto-board
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
